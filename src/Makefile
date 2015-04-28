@@ -1,19 +1,24 @@
 #SHELL:=/bin/bash
 
-# compile *some* libraries as static, others as dynamic: -Wl,-Bstatic ... -Wl,-Bdynamic
+OGRE_INCLUDE:=/usr/local/include/OGRE
 
+# compile *some* libraries as static, others as dynamic: -Wl,-Bstatic ... -Wl,-Bdynamic
 CFLAGS:=-Wall -O2 -DNDEBUG
-CPPFLAGS:=-I../jsoncpp/include -I/usr/include/OGRE -I/usr/include/OIS
-LIB_OGRE:=-lOIS -lOgreMain
-LIB_JSON:=-Wl,-Bstatic -L../jsoncpp/libs -ljson -Wl,-Bdynamic
+CPPFLAGS:=-pthread -I${OGRE_INCLUDE} -I${OGRE_INCLUDE}/Overlay \
+	-I/usr/include/OIS -I/usr/include/jsoncpp
+LIBS:=-lpthread -lm -Wl,-Bstatic -ljsoncpp -Wl,-Bdynamic
+LIB_OGRE:=-lOIS -lOgreMain -lOgreOverlay -lboost_system
 
 BINARY:=newton-gui newton-calc
 
 newton-gui: basic.o state.o integrator.o simulator.o ogre_framework.o ogre_app.o newton-gui.o
-	g++ basic.o state.o integrator.o simulator.o ogre_framework.o ogre_app.o newton-gui.o -o newton-gui ${CFLAGS} ${CPPFLAGS} ${LIB_OGRE} ${LIB_JSON}
+	g++ basic.o state.o integrator.o simulator.o \
+		ogre_framework.o ogre_app.o newton-gui.o \
+		-o newton-gui ${CFLAGS} ${CPPFLAGS} ${LIBS} ${LIB_OGRE}
 
 newton-calc: basic.o state.o integrator.o simulator.o newton-calc.o
-	g++ basic.o state.o integrator.o simulator.o newton-calc.o -o newton-calc ${CFLAGS} ${CPPFLAGS} ${LIB_JSON}
+	g++ basic.o state.o integrator.o simulator.o newton-calc.o \
+		-o newton-calc ${CFLAGS} ${CPPFLAGS} ${LIBS}
 
 ogre_app.o: ogre_app.cpp ogre_app.h basic.h state.h integrator.h simulator.h ogre_framework.h TextDisplay.h
 
@@ -35,7 +40,7 @@ debug: CFLAGS:=-Wall -g -ggdb
 
 install: ${BINARY}
 	cp  ${BINARY} ../
-	
+
 clean:
 	rm -f *.o
 	rm -f ${BINARY}

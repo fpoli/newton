@@ -1,6 +1,7 @@
 *~
 *.log
+*.o
 newton-gui
 newton-calc
-jsoncpp/
+ogre/
 doc/

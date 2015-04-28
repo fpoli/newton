@@ -6,6 +6,7 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #include <math.h>
+#include <stdio.h>
 
 #include <OgreCamera.h>
 #include <OgreEntity.h>
@@ -71,6 +72,7 @@ private:
 	OgreFramework& operator= (const OgreFramework&);
 
 	OgreBites::SdkTrayManager*	m_pTrayMgr;
+	OgreBites::InputContext 	mInputContext;
     Ogre::FrameEvent            m_FrameEvent;
 	int							m_iNumScreenShots;
 

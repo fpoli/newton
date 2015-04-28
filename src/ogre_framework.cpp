@@ -8,7 +8,7 @@ using namespace Ogre;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-template<> OgreFramework* Singleton<OgreFramework>::ms_Singleton = 0;
+template<> OgreFramework* Singleton<OgreFramework>::msSingleton = 0;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -40,8 +40,8 @@ OgreFramework::OgreFramework()
 
 bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
 {
-    LogManager* logMgr = new LogManager(); // Don't remove! otherwise Assertion `ms_Singleton' fails
-    
+    new LogManager(); // Don't remove! Initialize LogManager singleton
+
     m_pLog = LogManager::getSingleton().createLog("ogre.log", true, true, false);
     m_pLog->setDebugOutputEnabled(true);
 
@@ -53,6 +53,10 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
 
     m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
     m_pSceneMgr->setAmbientLight(ColourValue(0.7f, 0.7f, 0.7f));
+
+    //Fix for 1.9
+    Ogre::OverlaySystem *m_pOverlaySystem = new Ogre::OverlaySystem();
+    m_pSceneMgr->addRenderQueueListener(m_pOverlaySystem);
 
     m_pCamera = m_pSceneMgr->createCamera("Camera");
     m_pCamera->setPosition(Vector3(0, 60, 60));
@@ -112,12 +116,16 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
         }
     }
     TextureManager::getSingleton().setDefaultNumMipmaps(5);
-    ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+	ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
     m_pTimer = new Timer();
     m_pTimer->reset();
 
-    m_pTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", m_pRenderWnd, m_pMouse, this);
+    //Fix for 1.9
+    mInputContext.mKeyboard = m_pKeyboard;
+    mInputContext.mMouse = m_pMouse;
+
+    m_pTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", m_pRenderWnd, mInputContext, this);
     //m_pTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     //m_pTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
     m_pTrayMgr->hideCursor();

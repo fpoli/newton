@@ -1,6 +1,7 @@
 #SHELL:=/bin/bash
 
-SUBDIRS = src
+SUBDIRS:= src
+BINARY:= newton-gui newton-calc
 
 all:
 	@for dir in $(SUBDIRS) ; do \
@@ -19,30 +20,25 @@ install:
 
 lib:
 	# Assicurati di poter compilare (g++, ecc)
-	sudo apt-get install build-essential
-	
-	# Scarica e compila jsoncpp (parser json)
-	sudo apt-get install scons
-	# non andare a capo!
-	if [ ! -d "jsoncpp" ]; \
-	then \
-		wget "http://downloads.sourceforge.net/project/jsoncpp/jsoncpp/0.5.0/jsoncpp-src-0.5.0.tar.gz"; \
-		tar -xvzf jsoncpp-src-0.5.0.tar.gz; \
-		mv jsoncpp-src-0.5.0 jsoncpp; \
-	fi
-	# non andare a capo!
-	cd jsoncpp ; scons platform=linux-gcc; cp libs/*/*.a libs/libjson.a; cd ..;
-	
+	sudo apt-get install build-essential mercurial cmake-gui
+
+	# Installa jsoncpp (parser json)
+	sudo apt-get install libjsoncpp-dev
+
 	# Insalla la libreria OIS (per input da tastiera e mouse) richiesta da OGRE
 	sudo apt-get install libois-dev
-	
+
 	# Installa OGRE (motore grafico 3D)
-	sudo add-apt-repository ppa:ogre-team/ogre
-	sudo apt-get update
-	sudo apt-get install libogre-dev ogre-samples-media
-	
+	hg clone https://bitbucket.org/sinbad/ogre -r v1-9-0 ogre
+	sudo apt-get install libfreetype6-dev libboost-date-time-dev \
+		libboost-thread-dev nvidia-cg-toolkit libfreeimage-dev \
+		zlib1g-dev libzzip-dev libois-dev libcppunit-dev doxygen \
+		libxt-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libglu-dev
+	cd ogre && cmake . && make -j 4 && sudo make install && sudo ldconfig
+
 clean:
 	rm -f *~
+	rm -f ${BINARY}
 	@for dir in $(SUBDIRS) ; do \
 		cd $$dir ; make clean ; cd .. ; \
 	done ;
