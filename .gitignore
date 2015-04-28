@@ -1,0 +1,6 @@
+*~
+*.log
+newton-gui
+newton-calc
+jsoncpp/
+doc/
