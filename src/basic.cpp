@@ -4,9 +4,9 @@
 
 int clamp(int val, int min, int max)
 {
-	if (val>max) return max;
-	if (val<min) return min;
-	return val;
+    if (val>max) return max;
+    if (val<min) return min;
+    return val;
 }
 
 // Stampa un errore con una sintassi tipo printf() ed esci

@@ -16,23 +16,23 @@ namespace Ogre {
 
 OgreFramework::OgreFramework()
 {
-    m_bShutDownOgre		= false;
-    m_iNumScreenShots	= 0;
+    m_bShutDownOgre        = false;
+    m_iNumScreenShots    = 0;
 
-	orbiting			= 0;
-	turn_zoom			= 0;
+    orbiting            = 0;
+    turn_zoom            = 0;
 
-    m_pRoot				= 0;
-    m_pSceneMgr			= 0;
-    m_pRenderWnd		= 0;
-    m_pCamera			= 0;
-    m_pViewport			= 0;
-    m_pLog				= 0;
-    m_pTimer			= 0;
+    m_pRoot                = 0;
+    m_pSceneMgr            = 0;
+    m_pRenderWnd        = 0;
+    m_pCamera            = 0;
+    m_pViewport            = 0;
+    m_pLog                = 0;
+    m_pTimer            = 0;
 
-    m_pInputMgr			= 0;
-    m_pKeyboard			= 0;
-    m_pMouse			= 0;
+    m_pInputMgr            = 0;
+    m_pKeyboard            = 0;
+    m_pMouse            = 0;
 
     m_pTrayMgr          = 0;
     m_FrameEvent        = FrameEvent();
@@ -70,13 +70,13 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
     m_pViewport = m_pRenderWnd->addViewport(m_pCamera);
     m_pViewport->setBackgroundColour(ColourValue(0.8f, 0.7f, 0.6f, 1.0f));
 
-	m_pCamera->setAspectRatio(Real(m_pViewport->getActualWidth()) / Real(m_pViewport->getActualHeight()));
+    m_pCamera->setAspectRatio(Real(m_pViewport->getActualWidth()) / Real(m_pViewport->getActualHeight()));
 
     m_pViewport->setCamera(m_pCamera);
 
-	// Orbit camera
-	//m_pCameraMan = new OgreBites::SdkCameraMan(m_pCamera);
-	//m_pCameraMan->setStyle(OgreBites::CS_ORBIT);
+    // Orbit camera
+    //m_pCameraMan = new OgreBites::SdkCameraMan(m_pCamera);
+    //m_pCameraMan->setStyle(OgreBites::CS_ORBIT);
 
     uint64_t hWnd = 0;
     OIS::ParamList paramList;
@@ -90,7 +90,7 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
     m_pMouse = static_cast<OIS::Mouse*>(m_pInputMgr->createInputObject(OIS::OISMouse, true));
 
     m_pMouse->getMouseState().height = m_pRenderWnd->getHeight();
-    m_pMouse->getMouseState().width	 = m_pRenderWnd->getWidth();
+    m_pMouse->getMouseState().width     = m_pRenderWnd->getWidth();
 
     if(pKeyListener == 0)
         m_pKeyboard->setEventCallback(this);
@@ -120,7 +120,7 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
         }
     }
     TextureManager::getSingleton().setDefaultNumMipmaps(5);
-	ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
     m_pTimer = new Timer();
     m_pTimer->reset();
@@ -136,10 +136,10 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
 
     m_pRenderWnd->setActive(true);
 
-	Quaternion yaw(Degree(90), Vector3::UNIT_Y);
-	Quaternion pitch(Degree(0), Vector3::UNIT_X);
-	Quaternion roll(Degree(30), Vector3::UNIT_Z);
-	m_pSceneMgr->setSkyBox(true, "SkyBox", 5E10, true, yaw*pitch*roll);
+    Quaternion yaw(Degree(90), Vector3::UNIT_Y);
+    Quaternion pitch(Degree(0), Vector3::UNIT_X);
+    Quaternion roll(Degree(30), Vector3::UNIT_Z);
+    m_pSceneMgr->setSkyBox(true, "SkyBox", 5E10, true, yaw*pitch*roll);
 
     return true;
 }
@@ -205,7 +205,7 @@ bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
         }
     }
 
-	//m_pCameraMan->injectKeyDown(keyEventRef);
+    //m_pCameraMan->injectKeyDown(keyEventRef);
     return true;
 }
 
@@ -213,7 +213,7 @@ bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
 
 bool OgreFramework::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
-	//m_pCameraMan->injectKeyUp(keyEventRef);
+    //m_pCameraMan->injectKeyUp(keyEventRef);
     return true;
 }
 
@@ -221,57 +221,57 @@ bool OgreFramework::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 {
-	//m_pCamera->yaw(Degree(evt.state.X.rel * -0.1f));
-	//m_pCamera->pitch(Degree(evt.state.Y.rel * -0.1f));
-	//m_pCamera->setPosition(m_pCamera->getPosition()*pow(1.03,-evt.state.Z.rel/10));
+    //m_pCamera->yaw(Degree(evt.state.X.rel * -0.1f));
+    //m_pCamera->pitch(Degree(evt.state.Y.rel * -0.1f));
+    //m_pCamera->setPosition(m_pCamera->getPosition()*pow(1.03,-evt.state.Z.rel/10));
 
-	Real dist = m_pCamera->getPosition().length();
-	//Vector3 position = m_pCamera->getPosition();
-	Quaternion rot = m_pCamera->getOrientation();
+    Real dist = m_pCamera->getPosition().length();
+    //Vector3 position = m_pCamera->getPosition();
+    Quaternion rot = m_pCamera->getOrientation();
 
-	if (orbiting)   // yaw around the target, and pitch locally
-	{
-		m_pCamera->setPosition(Vector3(0, 0, 0));
+    if (orbiting)   // yaw around the target, and pitch locally
+    {
+        m_pCamera->setPosition(Vector3(0, 0, 0));
 
-		Quaternion yaw(Degree(-evt.state.X.rel * 0.25f), Vector3::UNIT_Y);
-		Quaternion pitch(Degree(-evt.state.Y.rel * 0.25f), Vector3::UNIT_X);
+        Quaternion yaw(Degree(-evt.state.X.rel * 0.25f), Vector3::UNIT_Y);
+        Quaternion pitch(Degree(-evt.state.Y.rel * 0.25f), Vector3::UNIT_X);
 
-		// L'ordine della moltiplicazione è importante!
-		// rot * yaw * pitch  ruota rispetto alla assi della visuale (~free camera)
-		// yaw * pitch * rot  ruota rispetto agli assi derivati dal nodo padre (~orbit camera)
-		m_pCamera->setOrientation(rot * yaw * pitch);
+        // L'ordine della moltiplicazione è importante!
+        // rot * yaw * pitch  ruota rispetto alla assi della visuale (~free camera)
+        // yaw * pitch * rot  ruota rispetto agli assi derivati dal nodo padre (~orbit camera)
+        m_pCamera->setOrientation(rot * yaw * pitch);
 
-		m_pCamera->moveRelative(Vector3(0, 0, dist));
+        m_pCamera->moveRelative(Vector3(0, 0, dist));
 
-		// don't let the camera go over the top or around the bottom of the target
-	}
-	else if (turn_zoom)
-	{
-		// turn the camera (before zooming!)
-		m_pCamera->setPosition(Vector3(0, 0, 0));
+        // don't let the camera go over the top or around the bottom of the target
+    }
+    else if (turn_zoom)
+    {
+        // turn the camera (before zooming!)
+        m_pCamera->setPosition(Vector3(0, 0, 0));
 
-		Quaternion yaw(Degree(-evt.state.X.rel * 0.25f), Vector3::UNIT_Y);
-		Quaternion roll(Degree(evt.state.Y.rel * 0.25f), Vector3::UNIT_Z);
+        Quaternion yaw(Degree(-evt.state.X.rel * 0.25f), Vector3::UNIT_Y);
+        Quaternion roll(Degree(evt.state.Y.rel * 0.25f), Vector3::UNIT_Z);
 
-		// L'ordine della moltiplicazione è importante!
-		// rot * yaw * roll  ruota rispetto alla assi della visuale (~free camera)
-		// yaw * roll * rot  ruota rispetto agli assi derivati dal nodo padre (~orbit camera)
-		m_pCamera->setOrientation(rot * yaw * roll);
+        // L'ordine della moltiplicazione è importante!
+        // rot * yaw * roll  ruota rispetto alla assi della visuale (~free camera)
+        // yaw * roll * rot  ruota rispetto agli assi derivati dal nodo padre (~orbit camera)
+        m_pCamera->setOrientation(rot * yaw * roll);
 
-		m_pCamera->moveRelative(Vector3(0, 0, dist));
+        m_pCamera->moveRelative(Vector3(0, 0, dist));
 
 
-		// move the camera toward or away from the target
-		// the further the camera is, the faster it moves
-		//m_pCamera->moveRelative(Vector3(0, 0, evt.state.Y.rel * 0.004f * dist));
+        // move the camera toward or away from the target
+        // the further the camera is, the faster it moves
+        //m_pCamera->moveRelative(Vector3(0, 0, evt.state.Y.rel * 0.004f * dist));
 
-		// don't let the camera go over the top or around the bottom of the target
-	}
-	else if (evt.state.Z.rel != 0)  // move the camera toward or away from the target
-	{
-		// the further the camera is, the faster it moves
-		m_pCamera->moveRelative(Vector3(0, 0, -evt.state.Z.rel * 0.0009f * dist));
-	}
+        // don't let the camera go over the top or around the bottom of the target
+    }
+    else if (evt.state.Z.rel != 0)  // move the camera toward or away from the target
+    {
+        // the further the camera is, the faster it moves
+        m_pCamera->moveRelative(Vector3(0, 0, -evt.state.Z.rel * 0.0009f * dist));
+    }
     return true;
 }
 
@@ -279,7 +279,7 @@ bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 
 bool OgreFramework::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
-	if (id == OIS::MB_Left) orbiting = true;
+    if (id == OIS::MB_Left) orbiting = true;
     else if (id == OIS::MB_Right) turn_zoom = true;
     return true;
 }
@@ -288,7 +288,7 @@ bool OgreFramework::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 
 bool OgreFramework::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
-	if (id == OIS::MB_Left) orbiting = false;
+    if (id == OIS::MB_Left) orbiting = false;
     else if (id == OIS::MB_Right) turn_zoom = false;
     return true;
 }

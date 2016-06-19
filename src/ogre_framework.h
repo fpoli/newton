@@ -36,54 +36,54 @@
 class OgreFramework : public Ogre::Singleton<OgreFramework>, OIS::KeyListener, OIS::MouseListener, OgreBites::SdkTrayListener
 {
 public:
-	OgreFramework();
-	~OgreFramework();
+    OgreFramework();
+    ~OgreFramework();
 
-	bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MouseListener *pMouseListener = 0);
-	void updateOgre(double timeSinceLastFrame);
-	void moveCamera();
-	void getInput();
+    bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MouseListener *pMouseListener = 0);
+    void updateOgre(double timeSinceLastFrame);
+    void moveCamera();
+    void getInput();
 
-	bool isOgreToBeShutDown()const{return m_bShutDownOgre;}
+    bool isOgreToBeShutDown()const{return m_bShutDownOgre;}
 
-	bool keyPressed(const OIS::KeyEvent &keyEventRef);
-	bool keyReleased(const OIS::KeyEvent &keyEventRef);
+    bool keyPressed(const OIS::KeyEvent &keyEventRef);
+    bool keyReleased(const OIS::KeyEvent &keyEventRef);
 
-	bool mouseMoved(const OIS::MouseEvent &evt);
-	bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
-	bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
+    bool mouseMoved(const OIS::MouseEvent &evt);
+    bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
+    bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
 
-	bool	orbiting;
-	bool	turn_zoom;
+    bool    orbiting;
+    bool    turn_zoom;
 
-	Ogre::Root*					m_pRoot;
-	Ogre::SceneManager*			m_pSceneMgr;
-	Ogre::RenderWindow*			m_pRenderWnd;
-	Ogre::Camera*				m_pCamera;
-	Ogre::Viewport*				m_pViewport;
-	Ogre::Log*					m_pLog;
-	Ogre::Timer*				m_pTimer;
+    Ogre::Root*                    m_pRoot;
+    Ogre::SceneManager*            m_pSceneMgr;
+    Ogre::RenderWindow*            m_pRenderWnd;
+    Ogre::Camera*                m_pCamera;
+    Ogre::Viewport*                m_pViewport;
+    Ogre::Log*                    m_pLog;
+    Ogre::Timer*                m_pTimer;
 
-	OIS::InputManager*			m_pInputMgr;
-	OIS::Keyboard*				m_pKeyboard;
-	OIS::Mouse*					m_pMouse;
+    OIS::InputManager*            m_pInputMgr;
+    OIS::Keyboard*                m_pKeyboard;
+    OIS::Mouse*                    m_pMouse;
 
 private:
-	OgreFramework(const OgreFramework&);
-	OgreFramework& operator= (const OgreFramework&);
+    OgreFramework(const OgreFramework&);
+    OgreFramework& operator= (const OgreFramework&);
 
-	OgreBites::SdkTrayManager*	m_pTrayMgr;
-	OgreBites::InputContext 	mInputContext;
+    OgreBites::SdkTrayManager*    m_pTrayMgr;
+    OgreBites::InputContext     mInputContext;
     Ogre::FrameEvent            m_FrameEvent;
-	int							m_iNumScreenShots;
+    int                            m_iNumScreenShots;
 
-	bool						m_bShutDownOgre;
+    bool                        m_bShutDownOgre;
 
-	Ogre::Vector3				m_TranslateVector;
-	Ogre::Real					m_MoveSpeed;
-	Ogre::Degree				m_RotateSpeed;
-	float						m_MoveScale;
-	Ogre::Degree				m_RotScale;
+    Ogre::Vector3                m_TranslateVector;
+    Ogre::Real                    m_MoveSpeed;
+    Ogre::Degree                m_RotateSpeed;
+    float                        m_MoveScale;
+    Ogre::Degree                m_RotScale;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

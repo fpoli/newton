@@ -11,25 +11,25 @@
 
 class State {
 private:
-	unsigned int mat_size;
+    unsigned int mat_size;
 public:
-	Matrix pos, vel;
-	std::vector<Real> mass;
-	Real time;
-	
-	State();
-	State(unsigned int n);
-	~State();
-	
-	void clear();
-	void reserve(unsigned int n);
-	unsigned int size() const;
-	
-	void insert_particle(const Particle & p);
-	Particle get_particle(unsigned int i) const;
-	
-	void calc_acc(Matrix &acc) const;
-	Matrix calc_acc() const;
+    Matrix pos, vel;
+    std::vector<Real> mass;
+    Real time;
+    
+    State();
+    State(unsigned int n);
+    ~State();
+    
+    void clear();
+    void reserve(unsigned int n);
+    unsigned int size() const;
+    
+    void insert_particle(const Particle & p);
+    Particle get_particle(unsigned int i) const;
+    
+    void calc_acc(Matrix &acc) const;
+    Matrix calc_acc() const;
 };
 
 #endif

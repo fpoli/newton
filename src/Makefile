@@ -39,8 +39,8 @@ all: ${BINARY}
 
 debug: ${BINARY}
 debug: CFLAGS:= -g -ggdb -Wall -Wextra -Wformat -Wformat-security \
-	            -Wno-unused-parameter -Wno-unused-but-set-parameter \
-	            -Wno-overloaded-virtual
+				-Wno-unused-parameter -Wno-unused-but-set-parameter \
+				-Wno-overloaded-virtual
 
 install: ${BINARY}
 	cp  ${BINARY} ../
