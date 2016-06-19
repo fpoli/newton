@@ -1,6 +1,9 @@
 language: cpp
-compiler: g++
-sudo: false
+sudo: true
+
+compiler:
+  - g++
+  - clang++
 
 addons:
   apt:
@@ -12,7 +15,7 @@ addons:
       - python-pip
 
 install:
-  - pip install cpplint
+  - sudo pip install cpplint
 
 script:
   - make check || true
