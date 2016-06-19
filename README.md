@@ -49,7 +49,7 @@ Comandi
 - tasto `esc`: chiudi il programma
 - tasto `p`: ferma/riprendi la simulazione
 - tasto `n`: visualizza/nascondi i nomi dei pianeti
-- tasto `r`: riporta i pianeti nella situazione - originaria
+- tasto `r`: riporta i pianeti nella situazione originaria
 - tasto `t`: visualizza/nascondi il tracciato dei pianeti
 
 ### Movimento nello spazio
