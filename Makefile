@@ -6,12 +6,11 @@ CXX ?= g++
 
 all:
 	cd src && make all
+	cd src && cp $(BINARY) ../
 
 debug:
 	cd src && make debug
-
-install:
-	cd src && make install
+	cd src && cp $(BINARY) ../
 
 check:
 	@# TODO: fix more suppressed messages
@@ -50,6 +49,6 @@ sandwich:
 wargames:
 	@echo "Would you like to play a game?"
 	@read foo
-	@sleep 0.8; echo "A strange game."; \
-	sleep 0.8; echo "The only winning move is"; \
-	sleep 0.8; echo "not to play."
+	@sleep 0.8; echo "A strange game.";
+	@sleep 0.8; echo "The only winning move is";
+	@sleep 0.8; echo "not to play."

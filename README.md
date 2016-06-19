@@ -25,7 +25,7 @@ Installazione e utilizzo su Ubuntu/Debian
 
 ### Installazione delle liberie
 
-- Ogre 1.9 (libogre)
+- Ogre 1.9 (libogre-1.9)
 - JsonCpp (libjsoncpp)
 - OIS (libois)
 

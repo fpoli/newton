@@ -16,7 +16,6 @@ script:
   - make debug
   - make clean
   - make all
-  - make install
   - make test
 
 env:
