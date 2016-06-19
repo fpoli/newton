@@ -42,10 +42,14 @@ clean:
 	cd src && make clean
 
 sandwich:
-	@if [ `/usr/bin/id -u` -ne 0 ]; then echo "What? Make it yourself."; else echo "Okay."; fi
+	@if [ `/usr/bin/id -u` -ne 0 ]; \
+	then echo "What? Make it yourself."; \
+	else echo "Okay."; fi
 	@echo "http://xkcd.com/149/"
 
 wargames:
 	@echo "Would you like to play a game?"
 	@read foo
-	@echo "A strange game."; echo "The only winning move is"; echo "not to play."
+	@sleep 0.8; echo "A strange game."; \
+	sleep 0.8; echo "The only winning move is"; \
+	sleep 0.8; echo "not to play."
