@@ -24,3 +24,19 @@ script:
   - make all
   - make install
   - make test
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "aMN9yb4DRsHMIDCSezJwdFRo8bBu0ktkq8TT7NKNoAIp1SVbxbrCe6VNCn2GoMsfKhHuEo8U4dxCP5hUEj1KlIzb1mKXKW0j2lfRqzRLhtSL51CgSghgENLEAm0Xd8LkbGun4VHcB5P5allzhNhcZziMoIcab3fCNVzCnbXfLSI="
+
+addons:
+  coverity_scan:
+    project:
+      name: "fpoli/newton"
+      description: ""
+    notification_email: federpoli@gmail.com
+    build_command_prepend: "<Your build preprocessing command here>"
+    build_command: "make; make install"
+    branch_pattern: master

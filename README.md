@@ -2,6 +2,7 @@ Newton
 ======
 
 [![Build Status](https://travis-ci.org/fpoli/newton.svg?branch=master)](https://travis-ci.org/fpoli/newton)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/9216/badge.svg)](https://scan.coverity.com/projects/9216)
 
 Questo programma è una simulazione interattiva che mostra la traiettoria di corpi sotto l'azione della forza di attrazione gravitazionale reciproca. Prendendo in input posizione, massa e velocità ne simula gli spostamenti.
 
