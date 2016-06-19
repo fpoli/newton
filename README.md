@@ -21,9 +21,15 @@ Installazione e utilizzo su Ubuntu/Debian
 -----------------------------------------
 
 ### Installazione delle liberie
-Per Ubuntu 14.04
 
-	make lib
+- Ogre 1.9 (libogre)
+- JsonCpp (libjsoncpp)
+- OIS (libois)
+
+Su Ubuntu 14.04
+
+	sudo apt-get install libjsoncpp-dev libois-dev libogre-1.9-dev
+
 
 ### Compilazione
 
@@ -84,7 +90,7 @@ del file su cui deve essere salvata la configurazione finale.
 
 es: calcola la configurazione dei pianeti dopo un'ora (3600 secondi)
 
-	./newton-gui scripts/s-sol.conf 3600 scripts/s-sol_finale.conf
+	./newton-calc scripts/ssol-attuale.conf 3600 scripts/ssol-finale.conf
 
 Strumenti aggiuntivi
 --------------------
@@ -99,9 +105,11 @@ di una sfera nelle sei immagini di cui è composto il cubo del plugin skybox di 
 Fonti
 -----
 
-La texture della Via Lattea è una rielaborazione di [ESO - Milky Way]( https://commons.wikimedia.org/wiki/File:ESO_-_Milky_Way.jpg). Si veda il link per informazioni sulla licenza.
+La texture della Via Lattea è una rielaborazione di [ESO - Milky Way](https://commons.wikimedia.org/wiki/File:ESO_-_Milky_Way.jpg). Si veda il link per informazioni sulla licenza.
 
 I file in `media/`, ad eccezione di quelli riguardanti la Via Lattea, sono forniti assieme al codice sorgente di [Ogre](www.ogre3d.org). Si veda sotto per la licenza.
+
+I file in `src/ogre/`, sono forniti assieme al codice sorgente di [Ogre](www.ogre3d.org). Si veda sotto per la licenza.
 
 I dati sui pianeti e satelliti del sistema solare (posizione, velocità, ecc) provengono dal JPL HORIZONS System della NASA: http://ssd.jpl.nasa.gov/?horizons
 

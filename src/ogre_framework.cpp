@@ -54,8 +54,8 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
     m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
     m_pSceneMgr->setAmbientLight(ColourValue(0.7f, 0.7f, 0.7f));
 
-    //Fix for 1.9
-    Ogre::OverlaySystem *m_pOverlaySystem = new Ogre::OverlaySystem();
+    // Initialize OverlaySystem singleton
+    OverlaySystem *m_pOverlaySystem = new OverlaySystem();
     m_pSceneMgr->addRenderQueueListener(m_pOverlaySystem);
 
     m_pCamera = m_pSceneMgr->createCamera("Camera");
@@ -73,7 +73,7 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
 	// Orbit camera
 	//m_pCameraMan = new OgreBites::SdkCameraMan(m_pCamera);
 	//m_pCameraMan->setStyle(OgreBites::CS_ORBIT);
-	
+
     unsigned long hWnd = 0;
     OIS::ParamList paramList;
     m_pRenderWnd->getCustomAttribute("WINDOW", &hWnd);
@@ -121,7 +121,7 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
     m_pTimer = new Timer();
     m_pTimer->reset();
 
-    //Fix for 1.9
+    // Fix for 1.9
     mInputContext.mKeyboard = m_pKeyboard;
     mInputContext.mMouse = m_pMouse;
 
@@ -129,7 +129,7 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
     //m_pTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     //m_pTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
     m_pTrayMgr->hideCursor();
-	
+
     m_pRenderWnd->setActive(true);
 
 	Quaternion yaw(Degree(90), Vector3::UNIT_Y);
@@ -149,7 +149,7 @@ OgreFramework::~OgreFramework()
     if(m_pRoot)      delete m_pRoot;
     //if(m_pCameraMan) delete m_pCameraMan;
 }
-	
+
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
@@ -220,7 +220,7 @@ bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 	//m_pCamera->yaw(Degree(evt.state.X.rel * -0.1f));
 	//m_pCamera->pitch(Degree(evt.state.Y.rel * -0.1f));
 	//m_pCamera->setPosition(m_pCamera->getPosition()*pow(1.03,-evt.state.Z.rel/10));
-	
+
 	Real dist = m_pCamera->getPosition().length();
 	//Vector3 position = m_pCamera->getPosition();
 	Quaternion rot = m_pCamera->getOrientation();
@@ -228,10 +228,10 @@ bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 	if (orbiting)   // yaw around the target, and pitch locally
 	{
 		m_pCamera->setPosition(Vector3(0, 0, 0));
-		
+
 		Quaternion yaw(Degree(-evt.state.X.rel * 0.25f), Vector3::UNIT_Y);
 		Quaternion pitch(Degree(-evt.state.Y.rel * 0.25f), Vector3::UNIT_X);
-		
+
 		// L'ordine della moltiplicazione è importante!
 		// rot * yaw * pitch  ruota rispetto alla assi della visuale (~free camera)
 		// yaw * pitch * rot  ruota rispetto agli assi derivati dal nodo padre (~orbit camera)
@@ -245,17 +245,17 @@ bool OgreFramework::mouseMoved(const OIS::MouseEvent &evt)
 	{
 		// turn the camera (before zooming!)
 		m_pCamera->setPosition(Vector3(0, 0, 0));
-		
+
 		Quaternion yaw(Degree(-evt.state.X.rel * 0.25f), Vector3::UNIT_Y);
 		Quaternion roll(Degree(evt.state.Y.rel * 0.25f), Vector3::UNIT_Z);
-		
+
 		// L'ordine della moltiplicazione è importante!
 		// rot * yaw * roll  ruota rispetto alla assi della visuale (~free camera)
 		// yaw * roll * rot  ruota rispetto agli assi derivati dal nodo padre (~orbit camera)
 		m_pCamera->setOrientation(rot * yaw * roll);
 
 		m_pCamera->moveRelative(Vector3(0, 0, dist));
-		
+
 
 		// move the camera toward or away from the target
 		// the further the camera is, the faster it moves

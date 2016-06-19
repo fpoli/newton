@@ -25,10 +25,10 @@
 #include <OISKeyboard.h>
 #include <OISMouse.h>
 
-#include <SdkTrays.h>
-
 #include <OgreLight.h>
 #include <OgreWindowEventUtilities.h>
+
+#include "ogre/SdkTrays.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 

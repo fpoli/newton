@@ -5,7 +5,7 @@
 State::State() { clear(); }
 State::State(unsigned int n) { clear(); reserve(n); }
 State::~State() { clear(); }
-	
+
 void State::clear() {
 	pos.clear();
 	vel.clear();
@@ -78,7 +78,7 @@ void State::calc_acc(Matrix & acc) const {
 			//acc[j] += G / mass[j] * dist.unit() * dist.module() ;
 			#ifndef NDEBUG
 				if (acc[j].module() >= 300 *1000 *1000) {
-					printf("[State::calc_acc] L'accelerazione di #%u è troppo grande (%e m/s^2)\n", j, acc[j].module());
+					printf("[State::calc_acc] L'accelerazione di #%u è troppo grande (%Le m/s^2)\n", j, acc[j].module());
 				}
 			#endif
 		}

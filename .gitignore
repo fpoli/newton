@@ -3,5 +3,4 @@
 *.o
 newton-gui
 newton-calc
-ogre/
 ogre.cfg

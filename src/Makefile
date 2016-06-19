@@ -4,7 +4,7 @@ OGRE_INCLUDE:=/usr/local/include/OGRE
 
 # compile *some* libraries as static, others as dynamic: -Wl,-Bstatic ... -Wl,-Bdynamic
 CFLAGS:=-Wall -O2 -DNDEBUG
-CPPFLAGS:=-pthread -I${OGRE_INCLUDE} -I${OGRE_INCLUDE}/Overlay \
+CPPFLAGS:=-I${OGRE_INCLUDE} -I${OGRE_INCLUDE}/Overlay \
 	-I/usr/include/OIS -I/usr/include/jsoncpp
 LIBS:=-lpthread -lm -Wl,-Bstatic -ljsoncpp -Wl,-Bdynamic
 LIB_OGRE:=-lOIS -lOgreMain -lOgreOverlay -lboost_system
@@ -36,7 +36,8 @@ basic.o: basic.cpp basic.h
 all: ${BINARY}
 
 debug: ${BINARY}
-debug: CFLAGS:=-Wall -g -ggdb
+debug: CFLAGS:=  -g -ggdb -Wall -Wextra -Wformat -Wformat-security \
+	             -Wno-unused-parameter -Wno-unused-but-set-parameter
 
 install: ${BINARY}
 	cp  ${BINARY} ../
