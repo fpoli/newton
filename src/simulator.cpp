@@ -3,6 +3,7 @@
 #include "simulator.h"
 
 Simulator::Simulator() {
+	dt = 1;
 	state = new State;
 	old_state = new State;
 	clear();
@@ -32,7 +33,7 @@ void Simulator::reset() {
 	path.clear();
 	path_begin = 0;
 	count = 0;
-	
+
 	// Reset states
 	init_state();
 }
@@ -70,16 +71,16 @@ void Simulator::load_configuration(const Json::Value conf) {
 		v = 0;
 		for(int i=0; i<3; i++) v[i] = planets[index].get( "vel", Json::Value(0) ).get( Json::UInt(i), 0 ).asDouble();
 		p.vel = v;
-		sprintf(p.name, "%s", planets[index].get( "name", "Planet" ).asString().c_str() );
+		snprintf(p.name, sizeof(p.name), "%s", planets[index].get( "name", "Planet" ).asString().c_str() );
 		insert_planet(p);
 	}
 	if (planets.size() > 0)	printf("Inseriti %d pianeti\n", planets.size());
 	else printf("Atenzione: non è stato inserito nessun pianeta!\n");
-	
+
 	if (conf.get( "delete_center_mass_movement", 0 ).asBool()) {
 		delete_center_mass_movement();
 	}
-	
+
 	set_integrator( conf.get( "integrator", "rungekutta" ).asString().c_str() );
 	set_dt(conf.get( "dt", (double) dt ).asDouble() );
 	path_length = conf.get( "path_length", path_length ).asInt();
@@ -150,9 +151,9 @@ Planet Simulator::get_planet(unsigned int i) {
 		error("[Simulator::get_planet] L'elemento %u non esiste (min 0, max %u)\n", i, get_planet_number());
 	}
 	#endif
-	Planet p = planet[i];
-	p =	state->get_particle(i);
-	return p;
+	// Take mass, radius, ... from planet[i], then position, velocity, ...
+	// from state->get_particle(i)
+	return Planet(planet[i], state->get_particle(i));
 }
 
 // ======= Tracciato =======
@@ -222,12 +223,12 @@ void Simulator::set_integrator(const char method[]) {
 		error("[Simulator::set_integrator] metodo '%s' non riconosciuto\n", method);
 	}
 }
-	
+
 void Simulator::evolve(Real _dt) {
 	// dipende da un parametro del file di configurazione
 	// non chiudere tra #ifndef NDEBUG #endif !
 	if (integrator == NULL) error("[Simulator::evolve] E' necessario specificare un metodo per l'integrale\n");
-	
+
 	// swap state <--> old_state
 	State * old_tmp;
 	old_tmp = old_state;
@@ -235,7 +236,7 @@ void Simulator::evolve(Real _dt) {
 	state = old_tmp;
 	// state = funct(old_state, _dt)
 	integrator(*state, *old_state, _dt);
-	
+
 	// Salva il tracciato
 	if (path_step > 0) {
 		count++;

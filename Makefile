@@ -1,33 +1,45 @@
 #SHELL:=/bin/bash
 
-SUBDIRS:= src
 BINARY:= newton-gui newton-calc
 
+CXX ?= g++
+
 all:
-	@for dir in $(SUBDIRS) ; do \
-		cd $$dir ; make all ; cd .. ; \
-	done;
+	cd src && make all
 
 debug:
-	@for dir in $(SUBDIRS) ; do \
-		cd $$dir ; make debug ; cd .. ; \
-	done ;
+	cd src && make debug
 
 install:
-	@for dir in $(SUBDIRS) ; do \
-		cd $$dir ; make install ; cd .. ; \
-	done ;
+	cd src && make install
 
-lib:
-	sudo apt-get install build-essential libjsoncpp-dev libois-dev \
-		libogre-1.9-dev
+check:
+	@# TODO: fix more suppressed messages
+
+	@echo "=== CppLint ==="
+	@cpplint --quiet --linelength=200 \
+		--filter=-whitespace,-legal/copyright,-build/include_subdir,\
+-build/header_guard,-build/include_order,-build/namespaces,-runtime/explicit,\
+-runtime/references,-runtime/indentation_namespace,-readability/braces,\
+-readability/casting,-readability/namespace,-readability/todo \
+		src/*.h src/*.cpp src/ogre/*.h
+
+	@echo "=== CppCheck ==="
+	@cppcheck --quiet --enable=all \
+		--suppress=unusedFunction --suppress=noCopyConstructor \
+		--suppress=missingInclude --suppress=missingIncludeSystem \
+		src/
+
+test:
+	@for cfg in scripts/*.conf; do \
+		echo "=== Test configuration $$cfg ==="; \
+		./newton-calc "$$cfg" 3600 "$$cfg.out"; \
+	done
 
 clean:
 	rm -f *~
 	rm -f ${BINARY}
-	@for dir in $(SUBDIRS) ; do \
-		cd $$dir ; make clean ; cd .. ; \
-	done ;
+	cd src && make clean
 
 sandwich:
 	@if [ `/usr/bin/id -u` -ne 0 ]; then echo "What? Make it yourself."; else echo "Okay."; fi

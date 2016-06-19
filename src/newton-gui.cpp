@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	Json::Value conf;
 	char config_file_name[512] = "config.conf\0";
 	if (argc > 1) {
-		sprintf(config_file_name, "%s", argv[1]);
+		snprintf(config_file_name, sizeof(config_file_name), "%s", argv[1]);
 	} else {
 		usage(argv[0]);
 	}

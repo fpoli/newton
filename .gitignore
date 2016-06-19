@@ -1,6 +1,7 @@
 *~
 *.log
 *.o
+*.out
 newton-gui
 newton-calc
 ogre.cfg

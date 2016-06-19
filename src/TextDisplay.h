@@ -2,6 +2,7 @@
 #define __TextDisplay_H__
 
 #include <stdarg.h>
+#include <string>
 
 class AbstractTextDisplay {
 protected:
@@ -14,8 +15,7 @@ protected:
 	Ogre::OverlayContainer* m_pContainer;
 	Ogre::String m_text;
 public:
-	AbstractTextDisplay(const std::string& _ID) {
-		ID = _ID;
+	AbstractTextDisplay(const std::string& _ID) : ID(_ID) {
 		m_enabled = false;
 		m_text = "";
 
@@ -33,7 +33,7 @@ public:
 		m_pText->setDimensions(dim_x, dim_y);
 		m_pText->setMetricsMode(Ogre::GMM_PIXELS);
 		m_pText->setPosition(pos_x, pos_y);
-		
+
 		m_pText->setParameter("font_name", "TextFont");
 		m_pText->setParameter("char_height", "24");
 		m_pText->setParameter("horz_align", "right");
@@ -44,7 +44,7 @@ public:
 	}
 
 	virtual ~AbstractTextDisplay() {
-		// overlay cleanup -- Ogre would clean this up at app exit but if your app 
+		// overlay cleanup -- Ogre would clean this up at app exit but if your app
 		// tends to create and delete these objects often it's a good idea to do it here.
 		m_pOverlay->hide();
 		Ogre::OverlayManager *overlayManager = Ogre::OverlayManager::getSingletonPtr();
@@ -68,11 +68,11 @@ public:
 		m_text = text;
 		m_pText->setCaption(m_text);
 	}
-	
+
 	void setTextPrintf(const char *str, /*args*/ ...) {
 		char text[256];
 		va_list ap;
-	 
+
 		if (str == NULL) {
 			text[0]='\0';
 		} else {
@@ -80,13 +80,13 @@ public:
 			vsprintf(text, str, ap);
 			va_end(ap);
 		}
-	 
+
 		setText(text);
 	}
-	
+
 	void update()  {
 		if (!m_enabled) return;
-		
+
 		m_pContainer->setPosition(pos_x, pos_y);
 		m_pContainer->setDimensions(dim_x, dim_y);
 	}
@@ -96,7 +96,7 @@ public:
 class TextDisplay : public AbstractTextDisplay {
 public:
 	TextDisplay(const std::string& _ID) : AbstractTextDisplay(_ID) {
-		
+
 	}
 
 	virtual ~TextDisplay() { }
@@ -123,11 +123,11 @@ public:
 	void setObject(const Ogre::MovableObject* p) {
 		m_p = p;
 	}
-	
+
 	void setCamera(const Ogre::Camera* c) {
 		m_c = c;
 	}
-	
+
 	/**
 	* This little snippet gets the screenspace coordinates for a MovableObject
 	*
@@ -142,27 +142,27 @@ public:
 	{
 		if(!object->isInScene())
 			return false;
-		
+
 		Ogre::Matrix4 mat = camera->getProjectionMatrix() * camera->getViewMatrix();
 		const Ogre::AxisAlignedBox &AABB = object->getWorldBoundingBox(true);
-		
+
 		// Get the center point of the object's bounding box
 		Ogre::Vector3 point = AABB.getCenter();
-		
+
 		// Is the camera facing that point? If not, return false
 		Ogre::Plane cameraPlane = Ogre::Plane(Ogre::Vector3(camera->getDerivedOrientation().zAxis()), camera->getDerivedPosition());
 		if(cameraPlane.getSide(point) != Ogre::Plane::NEGATIVE_SIDE)
 			return false;
-		
+
 		// *** Get 2d coords of the nicest point***
 		const Ogre::Vector3* corners = AABB.getAllCorners();
 		// coordinate space [-1, 1]
 		float min_x = 2.0f, max_x = -2.0f, min_y = 2.0f, max_y = -2.0f;
-		
-		// expand the screen-space bounding-box so that it completely encloses 
+
+		// expand the screen-space bounding-box so that it completely encloses
 		// the object's AABB
 		for (int i=0; i<8; i++) {
-			// multiply the AABB corner vertex by the view matrix to 
+			// multiply the AABB corner vertex by the view matrix to
 			// get a screen-space vertex
 			Ogre::Vector3 corner = mat * corners[i];
 
@@ -171,20 +171,20 @@ public:
 			if (corner.y < min_y) min_y = corner.y;
 			if (corner.y > max_y) max_y = corner.y;
 		}
-		
+
 		// Transform from coordinate space [-1, 1] to [0, 1] and update in-value
 		result.x = (max_x / 2) + 0.5f;
 		result.y = 1 - ((max_y / 2) + 0.5f);
-		
+
 		return true;
 	}
-	
+
 	void update()  {
 		if (!m_enabled) return;
-		
+
 		Ogre::Vector2 pos(0,0);
 		bool is_visible = getScreenspaceCoords(m_p, m_c, pos);
-		
+
 		if (!is_visible) {
 			m_pContainer->setPosition(2, 2); // don't show
 		} else {

@@ -15,7 +15,7 @@
 void usage(const char *prog)
 {
 	printf("Usare %s [configurazione] [durata] [output]\n", prog);
-	printf("  configurazione: percorso del file di configurazione\n"); 
+	printf("  configurazione: percorso del file di configurazione\n");
 	printf("  durata: durata della simulazione in secondi (anche non interi)\n");
 	printf("  output: percorso del file in cui verrà salvata la configurazione finale\n");
 	printf("\n");
@@ -27,17 +27,17 @@ int main(int argc, char *argv[])
 	Json::Value conf;
 	char config_file_name[512] = "config.conf";
 	char output_file_name[512] = "\0";
-	
+
 	// ======= Classi =======
 	Simulator simulator; // Simulator
-	
+
 	// ======= Leggi il file di configurazione =======
 	if (argc <= 1) {
 		usage(argv[0]);
 	}
-	if (argc > 1) sprintf(config_file_name, "%s", argv[1]);
+	if (argc > 1) snprintf(config_file_name, sizeof(config_file_name), "%s", argv[1]);
 	if (argc > 2) goal_time = atof(argv[2]);
-	if (argc > 3) sprintf(output_file_name, "%s", argv[3]);
+	if (argc > 3) snprintf(output_file_name, sizeof(output_file_name), "%s", argv[3]);
 	printf("Leggo il file di configurazione '%s'...\n", config_file_name);
 	std::ifstream config_file;
 	config_file.open(config_file_name);
@@ -47,16 +47,16 @@ int main(int argc, char *argv[])
 		error("Errore nel leggere il file di configurazione:\n%s", reader.getFormatedErrorMessages().c_str());
 	}
 	config_file.close();
-	
+
 	// ======= Applica la configurazione =======
 	simulator.load_configuration(conf);
 	simulator.init_state();
-	
+
 	// ======= Start =======
 	while (simulator.get_time() < goal_time) {
 		simulator.evolve();
 	}
-	
+
 	// ======= Scrivi il file con la nuova configurazione =======
 	if (output_file_name[0] != '\0') {
 		simulator.update_configuration(conf);
@@ -67,6 +67,6 @@ int main(int argc, char *argv[])
 		output_file << writer.write(conf);
 		config_file.close();
 	}
-	
+
 	return 0;
 }

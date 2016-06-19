@@ -3,19 +3,19 @@
  This source file is part of OGRE
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
- 
+
  Copyright (c) 2000-2013 Torus Knot Software Ltd
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,6 +27,10 @@
  */
 #ifndef __SdkTrays_H__
 #define __SdkTrays_H__
+
+#include <algorithm>
+#include <vector>
+#include <stdint.h>
 
 #include <Ogre.h>
 #include <OgreOverlaySystem.h>
@@ -104,7 +108,7 @@ namespace OgreBites
 	class Widget
 	{
 	public:
-			
+
 		Widget()
 		{
 			mTrayLoc = TL_NONE;
@@ -382,7 +386,7 @@ namespace OgreBites
 		Ogre::BorderPanelOverlayElement* mBP;
 		Ogre::TextAreaOverlayElement* mTextArea;
 		bool mFitToContents;
-	};  
+	};
 
 	/*=============================================================================
 	| Scrollable text box widget.
@@ -453,7 +457,7 @@ namespace OgreBites
 			mLines.clear();
 
 			Ogre::Font* font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(mTextArea->getFontName()).getPointer();
-            
+
 			Ogre::String current = DISPLAY_STRING_TO_STRING(text);
 			bool firstWord = true;
 			unsigned int lastSpace = 0;
@@ -693,7 +697,7 @@ namespace OgreBites
             mTextArea->setCharHeight(mTextArea->getCharHeight() - 3);
             mSmallTextArea->setCharHeight(mSmallTextArea->getCharHeight() - 3);
 #endif
-            
+
 			if (boxWidth > 0)  // long style
 			{
 				if (width <= 0) mFitToContents = true;
@@ -706,7 +710,7 @@ namespace OgreBites
 				mTextArea->setLeft(12);
 				mTextArea->setTop(10);
 			}
-						
+
 			mExpandedBox = (Ogre::BorderPanelOverlayElement*)((Ogre::OverlayContainer*)mElement)->getChild(name + "/MenuExpandedBox");
 			mExpandedBox->setWidth(mSmallBox->getWidth() + 10);
 			mExpandedBox->hide();
@@ -787,7 +791,7 @@ namespace OgreBites
 		{
 			Ogre::StringVector::iterator it;
 
-			for (it = mItems.begin(); it != mItems.end(); it++)
+			for (it = mItems.begin(); it != mItems.end(); ++it)
 			{
 				if (item == *it) break;
 			}
@@ -802,7 +806,7 @@ namespace OgreBites
 					mItemElements.pop_back();
 				}
 			}
-			else 
+			else
 			{
 				Ogre::String desc = "Menu \"" + getName() + "\" contains no item \"" + item + "\".";
 				OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "SelectMenu::removeItem");
@@ -814,7 +818,7 @@ namespace OgreBites
 			Ogre::StringVector::iterator it;
 			unsigned int i = 0;
 
-			for (it = mItems.begin(); it != mItems.end(); it++)
+			for (it = mItems.begin(); it != mItems.end(); ++it)
 			{
 				if (i == index) break;
 				i++;
@@ -830,7 +834,7 @@ namespace OgreBites
 					mItemElements.pop_back();
 				}
 			}
-			else 
+			else
 			{
 				Ogre::String desc = "Menu \"" + getName() + "\" contains no item at position " +
 					Ogre::StringConverter::toString(index) + ".";
@@ -1049,11 +1053,11 @@ namespace OgreBites
 		{
 			index = std::min<int>(index, (int)(mItems.size() - mItemElements.size()));
 			mDisplayIndex = index;
-			Ogre::BorderPanelOverlayElement* ie;
-			Ogre::TextAreaOverlayElement* ta;
 
 			for (int i = 0; i < (int)mItemElements.size(); i++)
 			{
+				Ogre::BorderPanelOverlayElement* ie;
+				Ogre::TextAreaOverlayElement* ta;
 				ie = mItemElements[i];
 				ta = (Ogre::TextAreaOverlayElement*)ie->getChild(ie->getName() + "/MenuItemText");
 
@@ -1218,7 +1222,7 @@ namespace OgreBites
             mTextArea->setCharHeight(mTextArea->getCharHeight() - 3);
             mValueTextArea->setCharHeight(mValueTextArea->getCharHeight() - 3);
 #endif
-            
+
 			if (trackWidth <= 0)  // tall style
 			{
 				mTrack->setWidth(width - 16);
@@ -1267,7 +1271,7 @@ namespace OgreBites
 		{
 			return mValueTextArea->getCaption();
 		}
-		
+
 		/*-----------------------------------------------------------------------------
 		| You can use this method to manually format how the value is displayed.
 		-----------------------------------------------------------------------------*/
@@ -1462,7 +1466,7 @@ namespace OgreBites
 			{
 				if (mNames[i] == DISPLAY_STRING_TO_STRING(paramName)) return mValues[i];
 			}
-			
+
 			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + DISPLAY_STRING_TO_STRING(paramName) + "\".";
 			OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::getParamValue");
 			return "";
@@ -1476,7 +1480,7 @@ namespace OgreBites
 					Ogre::StringConverter::toString(index) + ".";
 				OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::getParamValue");
 			}
-			
+
 			return mValues[index];
 		}
 
@@ -1762,7 +1766,7 @@ namespace OgreBites
 			mTrayWidgetAlign[9] = Ogre::GHA_LEFT;
 			mTraysLayer->add2D(mTrays[9]);
 			adjustTrays();
-			
+
 			showTrays();
 			showCursor();
 		}
@@ -2030,7 +2034,7 @@ namespace OgreBites
 						continue;
 					}
 					Separator* s = dynamic_cast<Separator*>(mWidgets[i][j]);
-					if (s && s->_isFitToTray()) 
+					if (s && s->_isFitToTray())
 					{
 						labelsAndSeps.push_back(e);
 						continue;
@@ -2666,7 +2670,7 @@ namespace OgreBites
 			mTrays[trayLoc]->addChild(widget->getOverlayElement());
 
 			widget->getOverlayElement()->setHorizontalAlignment(mTrayWidgetAlign[trayLoc]);
-			
+
 			// adjust trays if necessary
 			if (widget->getTrayLocation() != TL_NONE || trayLoc != TL_NONE) adjustTrays();
 
@@ -2750,7 +2754,7 @@ namespace OgreBites
 			mWidgetDeathRow.clear();
 
 
-            unsigned long currentTime = mTimer->getMilliseconds();
+            uint64_t currentTime = mTimer->getMilliseconds();
 			if (areFrameStatsVisible() && currentTime - mLastStatUpdateTime > 250)
 			{
                 Ogre::RenderTarget::FrameStats stats = mWindow->getStatistics();
@@ -2759,14 +2763,14 @@ namespace OgreBites
 
 				Ogre::String s("FPS: ");
 				s += Ogre::StringConverter::toString((int)stats.lastFPS);
-				
+
 				mFpsLabel->setCaption(s);
 
 				if (mStatsPanel->getOverlayElement()->isVisible())
 				{
 					Ogre::StringVector values;
 					Ogre::StringStream oss;
-					
+
 					oss.str("");
 					oss << std::fixed << std::setprecision(1) << stats.avgFPS;
 					Ogre::String str = oss.str();
@@ -3004,7 +3008,7 @@ namespace OgreBites
 				{
 					mYes->_cursorReleased(cursorPos);
 					// very important to check if second button still exists, because first button could've closed the popup
-					if (mNo) mNo->_cursorReleased(cursorPos); 
+					if (mNo) mNo->_cursorReleased(cursorPos);
 				}
 				return true;
 			}
@@ -3141,7 +3145,7 @@ namespace OgreBites
 		Ogre::Real mLoadInc;                  // loading increment
 		Ogre::GuiHorizontalAlignment mTrayWidgetAlign[10];   // tray widget alignments
         Ogre::Timer* mTimer;                  // Root::getSingleton().getTimer()
-        unsigned long mLastStatUpdateTime;    // The last time the stat text were updated
+        uint64_t mLastStatUpdateTime;    // The last time the stat text were updated
 
     };
 }

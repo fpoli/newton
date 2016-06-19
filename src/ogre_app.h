@@ -23,7 +23,7 @@ private:
 	void setupAppScene();
 	void updateScene();
 	void runApp();
-	
+
 	Ogre::Vector3		init_camera_pos;
 	double				init_camera_roll;
 	int					camera_anchor; // -1 = origine
@@ -36,30 +36,29 @@ private:
 	std::vector<Ogre::Entity*>			planetEntity;
 	std::vector<Ogre::ManualObject*>	pathManualObject;
 	std::vector<ObjectTextDisplay*>		planetLabel;
-	
-	
+
+
 	TextDisplay*	textTime;
 	TextDisplay*	textCenter;
 	TextDisplay*	textMsg;
 	TextDisplay*	textSimulLoop;
-	
+
 	bool	showPath;
 	bool	showLabel;
 	bool	showInfo;
 	bool	m_bShutdown;
 	bool	pause_simulation;
-	unsigned int	line_width;
-	
+
 public:
 	OgreApp(Simulator *_simulator);
 	~OgreApp();
-	
+
 	void startMainLoop();
-	
+
 	void load_configuration(const Json::Value conf);
 	void set_camera_anchor(int anchor);
 	void set_path_anchor(int anchor);
-	
+
 	bool keyPressed(const OIS::KeyEvent &keyEventRef);
 	bool keyReleased(const OIS::KeyEvent &keyEventRef);
 	bool mouseMoved(const OIS::MouseEvent &evt);
@@ -67,6 +66,6 @@ public:
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#endif 
+#endif
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

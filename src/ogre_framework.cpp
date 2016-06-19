@@ -8,7 +8,9 @@ using namespace Ogre;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-template<> OgreFramework* Singleton<OgreFramework>::msSingleton = 0;
+namespace Ogre {
+    template<> OgreFramework* Singleton<OgreFramework>::msSingleton = 0;
+}
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -34,6 +36,8 @@ OgreFramework::OgreFramework()
 
     m_pTrayMgr          = 0;
     m_FrameEvent        = FrameEvent();
+
+    m_MoveScale         = 0;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -74,7 +78,7 @@ bool OgreFramework::initOgre(String wndTitle, OIS::KeyListener *pKeyListener, OI
 	//m_pCameraMan = new OgreBites::SdkCameraMan(m_pCamera);
 	//m_pCameraMan->setStyle(OgreBites::CS_ORBIT);
 
-    unsigned long hWnd = 0;
+    uint64_t hWnd = 0;
     OIS::ParamList paramList;
     m_pRenderWnd->getCustomAttribute("WINDOW", &hWnd);
 

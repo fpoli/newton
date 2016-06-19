@@ -1,0 +1,23 @@
+language: cpp
+compiler: g++
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - libjsoncpp-dev
+      - libois-dev
+      - libogre-1.9-dev
+      - cppcheck
+      - python-pip
+
+install:
+  - pip install cpplint
+
+script:
+  - make check || true
+  - make debug
+  - make clean
+  - make all
+  - make install
+  - make test

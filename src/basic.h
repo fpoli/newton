@@ -30,6 +30,7 @@ private:
 public:
 	// costruttori
 	Vector() { vec[0] = 0; vec[1] = 0; vec[2] = 0; }
+	Vector(const Real & r) { vec[0] = r; vec[1] = r; vec[2] = r; }
 	Vector(Real _x, Real _y, Real _z)  { vec[0] = _x; vec[1] = _y; vec[2] = _z; }
 	void x(Real _x) { vec[0] = _x; }
 	void y(Real _y) { vec[1] = _y; }
@@ -66,7 +67,7 @@ public:
 		return vec[i];
 	}
 	friend Vector operator * (const Real & r, const Vector & v) { return v * r; }
-	
+
 	Real sqr_module() { return sqr(vec[0]) + sqr(vec[1]) + sqr(vec[2]); }
 	Real module() { return sqrt( sqr(vec[0]) + sqr(vec[1]) + sqr(vec[2]) ); }
 	Vector unit() { /*return (*this)/module();*/ Real m = module(); return Vector(vec[0] / m, vec[1] / m, vec[2] / m); }
@@ -96,15 +97,19 @@ public:
 	Real radius;
 	char name[256];
 	Vector color; // colore della scia
-	
-	Planet() : Particle() {
+
+	Planet() : Particle(), color(1) {
 		radius = 1;
 		name[0] = '\0';
-		color = 1;
+	}
+	Planet(const Planet & pl, const Particle & p) : Particle(p) {
+		radius = pl.radius;
+		snprintf(name, sizeof(name), "%s", pl.name);
+		color = pl.color;
 	}
 	Planet(Real _mass, Real _radius, char _name[], Vector _pos, Vector _vel) : Particle (_mass, _pos, _vel) {
 		radius = _radius;
-		sprintf(name, "%s", _name);
+		snprintf(name, sizeof(name), "%s", _name);
 	}
 	~Planet() {}
 	// Assegnazione
@@ -253,7 +258,7 @@ public:
 			vec[i] /= r;
 		}
 	}
-	
+
 	friend Matrix operator * (const Real & r, const Matrix & m) { return m * r; }
 
 	Vector operator () (unsigned int i) const {  // read-only !!

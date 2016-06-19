@@ -28,6 +28,8 @@
 #ifndef __InputContext_H__
 #define __InputContext_H__
 
+#include <vector>
+
 #include <Ogre.h>
 #include <OIS.h>
 

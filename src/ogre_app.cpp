@@ -12,12 +12,12 @@ Degree getRoll(const Camera* mCamera) {
 	Vector3 world_up = Vector3::UNIT_Z;
 	Vector3 target = mCamera->getDirection();
 	Vector3 cam_up = mCamera->getUp();
-	
+
 	// trova il nuovo cam_up (cioè goal)
 	Vector3 right = target.crossProduct(world_up);
 	Vector3 goal = right.crossProduct(target);
 	Quaternion rotup = cam_up.getRotationTo(goal);
-	
+
 	return Degree(acos(rotup.w)*2*180/PI);
 }
 
@@ -33,6 +33,18 @@ OgreApp::OgreApp(Simulator *_simulator)
 	showInfo = 0;
 	showLabel = 0;
 	showPath = 1;
+
+	camera_anchor = -1;
+	pathNode = NULL;
+	m_bShutdown = false;
+
+	textTime = NULL;
+    textCenter = NULL;
+    textMsg = NULL;
+    textSimulLoop = NULL;
+
+    // Initialize OgreFramework singleton
+    new OgreFramework();
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -40,10 +52,18 @@ OgreApp::OgreApp(Simulator *_simulator)
 OgreApp::~OgreApp()
 {
 	delete OgreFramework::getSingletonPtr();
-	delete textTime;
-	delete textCenter;
-	delete textMsg;
-	delete textSimulLoop;
+	if (textTime) {
+		delete textTime;
+	}
+	if (textCenter) {
+		delete textCenter;
+	}
+	if (textMsg) {
+		delete textMsg;
+	}
+	if (textSimulLoop) {
+		delete textSimulLoop;
+	}
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -52,15 +72,15 @@ void OgreApp::load_configuration(const Json::Value conf)
 {
 	if (conf.isMember("camera"))
 		for(int i=0; i<3; i++)
-			init_camera_pos[i] = conf.get( "camera", Json::Value(0) ).get( Json::UInt(i), init_camera_pos[i] ).asDouble();	
+			init_camera_pos[i] = conf.get( "camera", Json::Value(0) ).get( Json::UInt(i), init_camera_pos[i] ).asDouble();
 	init_camera_roll = conf.get( "camera_roll", init_camera_roll ).asDouble();
 	camera_anchor = conf.get( "camera_anchor", camera_anchor ).asInt();
-	
+
 	fps_goal = conf.get( "fps_goal", fps_goal ).asDouble();
-	
+
 	showPath = conf.get( "show_path", showPath ).asBool();
 	showLabel = conf.get( "show_label", showLabel ).asBool();
-	
+
 	int default_path_anchor = conf.get( "default_path_anchor", -1 ).asInt();
 	const Json::Value planets = conf["planets"];
 	path_anchor.resize(planets.size());
@@ -80,10 +100,9 @@ void OgreApp::load_configuration(const Json::Value conf)
 
 void OgreApp::startMainLoop()
 {
-	new OgreFramework();
 	if(!OgreFramework::getSingletonPtr()->initOgre("Newton", this, 0))
 		return;
-	
+
 	m_bShutdown = false;
 
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Newton initialized");
@@ -111,7 +130,7 @@ void OgreApp::setupAppScene()
 	OgreFramework::getSingletonPtr()->m_pCamera->rotate(rotup);
 	// rotate camera_up_vector as configured
 	OgreFramework::getSingletonPtr()->m_pCamera->roll(Degree(-init_camera_roll));
-	
+
  	OgreFramework::getSingletonPtr()->m_pCamera->setNearClipDistance(0.1);
 	OgreFramework::getSingletonPtr()->m_pCamera->setFarClipDistance(5E30);
 	if (OgreFramework::getSingletonPtr()->m_pRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))
@@ -123,39 +142,39 @@ void OgreApp::setupAppScene()
 	{
 		OgreFramework::getSingletonPtr()->m_pLog->logMessage("Unable to use infinite far clip distance");
 	}
-	
+
 	// Viewport
 	OgreFramework::getSingletonPtr()->m_pViewport->setBackgroundColour(ColourValue(0.05f, 0.05f, 0.05f, 1.0f));
-	
+
 	// Entità e oggetti
 	char name[512];
 	char material[512];
 	char label[512];
 	Vector pos, color;
-	
+
 	planetNode.resize(simulator->get_planet_number());
 	planetMaterial.resize(simulator->get_planet_number());
 	planetEntity.resize(simulator->get_planet_number());
 	pathManualObject.resize(simulator->get_planet_number());
 	planetLabel.resize(simulator->get_planet_number());
-	
+
 	// Attacca il nodo dei tracciati alla radice
 	pathNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("pathNode");
-	
+
 	for (int i=0; i<(int)simulator->get_planet_number(); ++i)
 	{
-		sprintf(material,"Material_%d", i+1);
-		sprintf(name,"Planet_%d", i+1);
-		sprintf(label,"Label_%d", i+1);
+		snprintf(material, sizeof(material), "Material_%d", i+1);
+		snprintf(name, sizeof(name), "Planet_%d", i+1);
+		snprintf(label, sizeof(label), "Label_%d", i+1);
 		pos = simulator->get_planet(i).pos;
 		color = simulator->get_planet(i).color;
-		
+
 		// Nodo
 		planetNode[i] = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode(name);
 		planetNode[i]->setPosition(pos[0],pos[1],pos[2]);
-		
+
 		// Materiale
-		planetMaterial[i] = MaterialManager::getSingleton().create(material,ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME); 
+		planetMaterial[i] = MaterialManager::getSingleton().create(material,ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		planetMaterial[i]->setReceiveShadows(false);
 		planetMaterial[i]->getTechnique(0)->setLightingEnabled(true);
 		planetMaterial[i]->getTechnique(0)->getPass(0)->setDiffuse(color[0],color[1],color[2],0);
@@ -167,15 +186,15 @@ void OgreApp::setupAppScene()
 		planetEntity[i] = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity(name, "sphere.mesh");
 		planetEntity[i]->setMaterial(planetMaterial[i]);
 		planetNode[i]->attachObject(planetEntity[i]);
-		
+
 		// Scala la mesh
 		planetNode[i]->setScale(Vector3(simulator->get_planet(i).radius/100));
-		
+
 		// Pianeta (entità)
 		planetLabel[i] = new ObjectTextDisplay(label, planetEntity[i], OgreFramework::getSingletonPtr()->m_pCamera);
 		planetLabel[i]->setText(simulator->get_planet(i).name);
 		planetLabel[i]->enable(showLabel);
-		
+
 		// Tracciato (oggetto manuale)
 		pathManualObject[i] = OgreFramework::getSingletonPtr()->m_pSceneMgr->createManualObject(name);
 		pathManualObject[i]->setDynamic(1);
@@ -185,11 +204,11 @@ void OgreApp::setupAppScene()
 		pathManualObject[i]->position(pos[0],pos[1],pos[2]);
 		pathManualObject[i]->position(pos[0],pos[1],pos[2]);
 		pathManualObject[i]->end();
-		
+
 		// Attacca il tracciato al nodo dei tracciati
 		pathNode->attachObject(pathManualObject[i]);
 	}
-	
+
 	// Ora che sono stati definiti i nodi puoi attaccarci la telecamera
 	// Se non viene fatto, set_camera_anchor() cerca di staccare dal nodo un oggetto che non c'è
 	camera_anchor = (camera_anchor+1+simulator->get_planet_number()+1)%(simulator->get_planet_number()+1)-1;
@@ -256,11 +275,11 @@ void OgreApp::set_camera_anchor(int anchor)
 	OgreFramework::getSingletonPtr()->m_pCamera->setOrientation(rot);
 	OgreFramework::getSingletonPtr()->m_pCamera->setPosition(pos);
 */
-	
+
 	// Aggiorna
 	camera_anchor = anchor;
 	printf("Telecamera centrata su #%d %s\n", anchor, anchor<0?"Origine":simulator->get_planet(anchor).name);
-	
+
 	textCenter->setTextPrintf("Telecamera centrata su #%d %s",
 		anchor, anchor<0?"Origine":simulator->get_planet(anchor).name);
 }
@@ -289,30 +308,30 @@ void OgreApp::set_path_anchor(int anchor)
 void OgreApp::updateScene()
 {
 	Vector pos, path, anchor;
-	
+
 	// Per ogni pianeta
 	for (int i=0; i<(int)simulator->get_planet_number(); ++i)
 	{
 		pos = simulator->get_planet(i).pos;
-		
+
 		// Pianeta
 		planetNode[i]->setPosition(pos[0],pos[1],pos[2]);
-		
+
 		// Se non devi visualizzare i tracciati
 		if (!showPath) continue;
-		
+
 		// Tracciato
 		//pathManualObject[i]->estimateVertexCount(simulator->get_path_length()+1);
 		pathManualObject[i]->beginUpdate(0);
 		//pathManualObject[i]->position(0, 0, 0);
 		pathManualObject[i]->position(pos[0],pos[1],pos[2]);
-		
+
 		// Per ogni punto del tracciato
 		for (int k=0; k<(int)simulator->get_path_length(); ++k)
 		{
 			// Ottieni i punti del tracciato: corrente e vecchio
 			path = simulator->get_path_point(k)->position[i];
-			
+
 			// Se il tracciato è relativo a qualcosa
 			if (path_anchor[i] >= 0 && path_anchor[i] < (int)simulator->get_planet_number())
 			{
@@ -329,7 +348,7 @@ void OgreApp::updateScene()
 void OgreApp::runApp()
 {
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Start main loop...");
-	
+
 	double timeSinceLastFrame = 0;
 	double startTime = 0;
 	unsigned int calibra = 10;
@@ -337,21 +356,21 @@ void OgreApp::runApp()
 	int trend = 0;
 
 	OgreFramework::getSingletonPtr()->m_pRenderWnd->resetStatistics();
-	
+
 	startTime = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU();
-	
+
 	while(!m_bShutdown && !OgreFramework::getSingletonPtr()->isOgreToBeShutDown())
 	{
 		if (OgreFramework::getSingletonPtr()->m_pRenderWnd->isClosed()) m_bShutdown = true;
 
 		WindowEventUtilities::messagePump();
-		
+
 		if (OgreFramework::getSingletonPtr()->m_pRenderWnd->isActive())
 		{
-			
+
 			OgreFramework::getSingletonPtr()->m_pKeyboard->capture();
 			OgreFramework::getSingletonPtr()->m_pMouse->capture();
-			
+
 			if (!pause_simulation)
 			{
 				for (unsigned int i=0; i<calibra; ++i) simulator->evolve();
@@ -370,7 +389,7 @@ void OgreApp::runApp()
 						} else {
 							//diminuisci cal_step
 							cal_step /= 2;
-							
+
 							trend = 0;
 						}
 					} else {
@@ -385,7 +404,7 @@ void OgreApp::runApp()
 						} else {
 							//diminuisci cal_step
 							cal_step /= 2;
-							
+
 							trend = 0;
 						}
 					}
@@ -394,7 +413,7 @@ void OgreApp::runApp()
 				}
 			}
 			updateScene();
-			
+
 			if (showInfo) {
 				textTime->setTextPrintf("Secondi trascorsi: %d", (int)simulator->get_time());
 				textSimulLoop->setTextPrintf("dt per frame: %u +- %u  trend: %d", calibra, cal_step, trend);
@@ -405,18 +424,18 @@ void OgreApp::runApp()
 			}
 			if (showLabel) {
 				for (int i=0; i<(int)simulator->get_planet_number(); ++i) {
-					planetLabel[i]->update();	
+					planetLabel[i]->update();
 				}
 			}
-			
+
 			OgreFramework::getSingletonPtr()->updateOgre(timeSinceLastFrame);
 			OgreFramework::getSingletonPtr()->m_pRoot->renderOneFrame();
-			
+
 			// Sono multipli di 10 millisecondi.. poco precisi
 			timeSinceLastFrame = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU() - startTime;
 			startTime = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU();
 			//printf("timeSinceLastFrame %.0lf   fps %.2f\n", timeSinceLastFrame, 1000.0f/timeSinceLastFrame);
-			//printf("Ogre-fps: %.2f\n", OgreFramework::getSingletonPtr()->m_pRenderWnd->getLastFPS()); 
+			//printf("Ogre-fps: %.2f\n", OgreFramework::getSingletonPtr()->m_pRenderWnd->getLastFPS());
 		}
 		else
 		{
@@ -437,7 +456,7 @@ void OgreApp::runApp()
 bool OgreApp::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
 	OgreFramework::getSingletonPtr()->keyPressed(keyEventRef);
-	
+
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_1))
 	{
 		set_camera_anchor(camera_anchor-1);
@@ -447,7 +466,7 @@ bool OgreApp::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		set_camera_anchor(camera_anchor+1);
 	}
-	
+
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_3))
 	{
 		set_path_anchor(camera_anchor<0?0:path_anchor[camera_anchor]-1);
@@ -464,14 +483,14 @@ bool OgreApp::keyPressed(const OIS::KeyEvent &keyEventRef)
 		printf("Simulazione %s\n", pause_simulation?"in pausa":"attivata");
 		textMsg->setTextPrintf("Simulazione %s\n", pause_simulation?"in pausa":"attivata");
 	}
-	
+
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_R))
 	{
 		printf("Reset\n");
 		textMsg->setTextPrintf("Reset");
 		simulator->reset();
 	}
-	
+
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_T))
 	{
 		showPath = !showPath;
@@ -479,7 +498,7 @@ bool OgreApp::keyPressed(const OIS::KeyEvent &keyEventRef)
 		textMsg->setTextPrintf("Tracciati dei pianeti: %s\n", showPath?"visibili":"nascosti");
 		pathNode->setVisible(showPath);
 	}
-	
+
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_N))
 	{
 		showLabel = !showLabel;
@@ -489,18 +508,18 @@ bool OgreApp::keyPressed(const OIS::KeyEvent &keyEventRef)
 			planetLabel[i]->enable(showLabel);
 		}
 	}
-	
+
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_C))
 	{
 		Vector3 cam = OgreFramework::getSingletonPtr()->m_pCamera->getPosition();
 		double roll = getRoll(OgreFramework::getSingletonPtr()->m_pCamera).valueDegrees();
-		
+
 		printf("Posizione della telecamera: [%e, %e, %e] roll +/-%.2lf rispetto a #%d %s\n",
 			cam[0], cam[1], cam[2], roll,
 			camera_anchor, simulator->get_planet(camera_anchor).name
 		);
 	}
-	
+
 	if(OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(OIS::KC_I))
 	{
 		showInfo = !showInfo;
@@ -510,7 +529,7 @@ bool OgreApp::keyPressed(const OIS::KeyEvent &keyEventRef)
 		textMsg->enable(showInfo);
 		textSimulLoop->enable(showInfo);
 	}
-	
+
 	return true;
 }
 
@@ -519,7 +538,7 @@ bool OgreApp::keyPressed(const OIS::KeyEvent &keyEventRef)
 bool OgreApp::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
 	OgreFramework::getSingletonPtr()->keyReleased(keyEventRef);
-	
+
 	return true;
 }
 
