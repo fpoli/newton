@@ -1,6 +1,8 @@
 Newton
 ======
 
+[![Build Status](https://travis-ci.org/fpoli/newton.svg?branch=master)](https://travis-ci.org/fpoli/newton)
+
 Questo programma è una simulazione interattiva che mostra la traiettoria di corpi sotto l'azione della forza di attrazione gravitazionale reciproca. Prendendo in input posizione, massa e velocità ne simula gli spostamenti.
 
 L'avevo preparato nel 2010 come tesina per la maturità al liceo scientifico. Di recente ho solo controllato che compilasse con Ogre 1.9 sotto Ubuntu 14.04, ma ho lasciato la qualità del codice che era. Di sicuro non è privo di bachi.
